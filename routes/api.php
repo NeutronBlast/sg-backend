@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('users', \App\Http\Controllers\UserController::class);
+Route::get('report', [\App\Http\Controllers\UserController::class, 'showNumberOfParticipants']);
 Route::put('users/disable/{id}', [\App\Http\Controllers\UserController::class, 'changeStatus']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

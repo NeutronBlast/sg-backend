@@ -31,6 +31,33 @@ class UserController extends Controller
         return response()->json($participants);
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return JsonResponse
+     */
+    public function showNumberOfParticipants(Request $request): JsonResponse
+    {
+        $now = Carbon::now();
+
+        if ($request->unit == 'Days') {
+            $from = Carbon::now()->subHours($request->number * 24);
+        }
+        else {
+            $from = Carbon::now()->subHours($request->number);
+        }
+
+        $participant = DB::table('participations')
+            ->join('users', 'users.id', '=', 'participations.user_id')
+            ->whereBetween('participations.participation_date', [$from, $now])
+            ->select()
+            ->get();
+
+        return response()->json([
+            'number' => sizeof($participant)
+        ], 200);
+    }
+
 
     /**
      * Store a newly created resource in storage.
