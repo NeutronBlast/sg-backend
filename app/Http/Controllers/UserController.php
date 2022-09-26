@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Dotenv\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -105,11 +106,19 @@ class UserController extends Controller
         $participant = DB::table('participations')
             ->join('users', 'users.id', '=', 'participations.user_id')
             ->where('users.id', '=', $id)
-            ->select('users.id', 'users.email', 'users.role', 'users.first_name', 'users.last_name', 'users.date_of_birth',
+            ->select('users.id', 'users.email', 'users.role', 'users.first_name', 'users.last_name',
+                'users.date_of_birth',
                 'participations.status')
             ->first();
 
-        return response()->json($participant);
+        return response()->json([
+            'id' => $participant->id,
+            'first_name' => $participant->first_name,
+            'last_name' => $participant->last_name,
+            'email' => $participant->email,
+            'date_of_birth' => $participant->date_of_birth,
+            'status' => $participant->status
+        ], 200);
     }
 
 
@@ -156,6 +165,7 @@ class UserController extends Controller
         $user->password = Hash::make($request->password);
         $user->date_of_birth = $request->date_of_birth;
         $user->save();
+
 
         return response()->json([
             'first_name' => $user->first_name,
