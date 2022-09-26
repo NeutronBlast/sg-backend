@@ -54,7 +54,7 @@ class UserController extends Controller
                 'unique:users'
             ],
             'password' => [
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'
             ]
         ]);
 
@@ -105,7 +105,7 @@ class UserController extends Controller
         $participant = DB::table('participations')
             ->join('users', 'users.id', '=', 'participations.user_id')
             ->where('users.id', '=', $id)
-            ->select('users.id', 'users.email', 'users.role', DB::raw('CONCAT(first_name, " ", last_name) AS full_name'),
+            ->select('users.id', 'users.email', 'users.role', 'users.first_name', 'users.last_name', 'users.date_of_birth',
                 'participations.status')
             ->first();
 
@@ -136,7 +136,7 @@ class UserController extends Controller
             ],
             'email' => [
                 'regex:/^\S+@\S+\.\S+$/',
-                'unique:users'
+                'unique:users,email,' . $id,
             ],
             'password' => [
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
