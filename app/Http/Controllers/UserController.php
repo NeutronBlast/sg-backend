@@ -23,7 +23,8 @@ class UserController extends Controller
     {
         $participants = DB::table('participations')
             ->join('users', 'users.id', '=', 'participations.user_id')
-            ->select('users.id', 'users.email', 'users.role', 'users.first_name', 'users.last_name', 'participations.status')
+            ->select('users.id', 'users.email', 'users.role', DB::raw('CONCAT(first_name, " ", last_name) AS full_name'),
+                'users.date_of_birth', 'participations.status')
             ->get();
 
         return response()->json($participants);
@@ -48,6 +49,7 @@ class UserController extends Controller
                 'max:100'
             ],
             'email' => [
+                'max:150',
                 'regex:/^\S+@\S+\.\S+$/',
                 'unique:users'
             ],
@@ -68,6 +70,7 @@ class UserController extends Controller
         $user->last_name = $request->last_name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        $user->date_of_birth = $request->date_of_birth;
         $user->role = 'Participant';
 
         $user->save();
@@ -85,6 +88,7 @@ class UserController extends Controller
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
+            'date_of_birth' => $user->date_of_birth,
             'participation_date' => $participation->participation_date,
             'status' => $participation->status
         ], 200);
@@ -101,7 +105,8 @@ class UserController extends Controller
         $participant = DB::table('participations')
             ->join('users', 'users.id', '=', 'participations.user_id')
             ->where('users.id', '=', $id)
-            ->select('users.id', 'users.email', 'users.role', 'users.first_name', 'users.last_name', 'participations.status')
+            ->select('users.id', 'users.email', 'users.role', DB::raw('CONCAT(first_name, " ", last_name) AS full_name'),
+                'participations.status')
             ->first();
 
         return response()->json($participant);
@@ -149,18 +154,20 @@ class UserController extends Controller
         $user->last_name = $request->last_name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        $user->date_of_birth = $request->date_of_birth;
         $user->save();
 
         return response()->json([
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
+            'date_of_birth' => $user->date_of_birth,
             'participation_date' => $participation->participation_date,
             'status' => $participation->status
         ], 200);
     }
 
-    public function disable(Request $request, int $id): JsonResponse
+    public function changeStatus(Request $request, int $id): JsonResponse
     {
         $user = User::find($id);
         $participation = Participation::where('user_id', $id)->first();
@@ -172,6 +179,7 @@ class UserController extends Controller
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
+            'date_of_birth' => $user->date_of_birth,
             'participation_date' => $participation->participation_date,
             'status' => $participation->status
         ], 200);
