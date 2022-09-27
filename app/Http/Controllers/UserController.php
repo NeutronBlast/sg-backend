@@ -26,6 +26,7 @@ class UserController extends Controller
             ->join('users', 'users.id', '=', 'participations.user_id')
             ->select('users.id', 'users.email', 'users.role', DB::raw('CONCAT(first_name, " ", last_name) AS full_name'),
                 'users.date_of_birth', 'participations.status')
+            ->where('users.role', '<>', 'Administrator')
             ->get();
 
         return response()->json($participants);
