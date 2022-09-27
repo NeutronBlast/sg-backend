@@ -198,6 +198,7 @@ return [
         /* Other providers */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
+
     ],
 
     /*
